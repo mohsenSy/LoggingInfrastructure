@@ -1,0 +1,83 @@
+- hosts: web
+  become: true
+  gather_facts: false
+
+  handlers:
+    - name: restart apache2
+      service:
+        name: apache2
+        state: restarted
+
+  tasks:
+    - name: Download composer installer
+      get_url:
+        url: https://getcomposer.org/installer
+        dest: /tmp/composer-setup.php
+    - name: install php and apache2
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - php5
+        - apache2
+    - name: start apache2
+      service:
+        name: apache2
+        state: started
+    - name: Install composer
+      shell: |
+        php /tmp/composer-setup.php --filename=composer --install-dir=/usr/local/bin
+        creates=/usr/local/bin/composer
+    - name: Download symfony installer
+      shell: |
+        wget https://symfony.com/installer -O /usr/local/bin/symfony && chmod 755 /usr/local/bin/symfony creates=/usr/local/bin/symfony
+    - name: Create a new symfony 3.2 project
+      shell: |
+        symfony new . 3.2
+        chdir=/var/www/html/test_app
+        creates=/var/www/html/test_app/composer.json
+    - name: Setup php time zone
+      lineinfile:
+        name: "/etc/php5/{{ item }}/php.ini"
+        line: "date.timezone = Asia/Damascus"
+        state: present
+      with_items:
+        - cli
+        - apache2
+      notify: restart apache2
+    - name: copy apache2 configuration file
+      copy:
+        src: files/site.conf
+        dest: /etc/apache2/sites-available
+      notify: restart apache2
+    - name: enable new site
+      file:
+        src: /etc/apache2/sites-available/site.conf
+        dest: /etc/apache2/sites-enabled/site.conf
+        state: link
+      notify: restart apache2
+    - name: Disable default apache2 site
+      file:
+        name: /etc/apache2/sites-enabled/000-default.conf
+        state: absent
+      notify: restart apache2
+    - name: Enable apache2 mod_rewrite
+      apache2_module:
+        name: rewrite
+        state: present
+      notify: restart apache2
+    - name: Copy modified app_dev.php file
+      copy:
+        src: files/app_dev.php
+        dest: /var/www/html/test_app/web/app_dev.php
+    - name: Fix permissions for cache, logs and sessions directories
+      file:
+        name: "/var/www/html/test_app/var/{{ item }}"
+        state: directory
+        mode: 0755
+        owner: www-data
+        group: www-data
+      with_items:
+        - cache
+        - logs
+        - sessions
