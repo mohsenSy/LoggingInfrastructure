@@ -25,7 +25,11 @@ class DefaultController extends Controller
     */
     public function testAction(Request $request)
     {
-      
+      $logger = $this->get("logger");
+      $client = $request->headers->get("X-Forwarded-For",$request->getClientIp());
+      $page = "/test";
+      $context = array("client" => $client, "page" => $page);
+      $logger->info("test", $context);
       return new Response(
         "<html><body>Test Page</body></html>"
       );

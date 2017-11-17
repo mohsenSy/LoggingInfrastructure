@@ -4,6 +4,17 @@ parameters:
     #parameter_name: value
 
 services:
+    PhpAmqpLib.Channel.AMQPExchange:
+      class: PhpAmqpLib\Channel\AMQPChannel
+      arguments:
+        $connection: '@PhpAmqpLib.Connection.AMQPSocketConnection'
+    PhpAmqpLib.Connection.AMQPSocketConnection:
+      class: PhpAmqpLib\Connection\AMQPSocketConnection
+      arguments:
+        $host: localhost
+        $port: 5672
+        $user: guest
+        $password: guest
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
