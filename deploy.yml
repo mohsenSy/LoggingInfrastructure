@@ -7,6 +7,35 @@
       service:
         name: apache2
         state: restarted
+  vars:
+    - RABBITMQ_USER: mohsen
+    - RABBITMQ_PASS: mohsen
+    - RABBITMQ_PLUGINS:
+      - name: rabbitmq_management
+    - RABBITMQ_VHOSTS:
+      - name: /log
+    - RABBITMQ_USERS:
+      - name: guest
+        state: absent
+      - name: mohsen
+        password: mohsen
+        tags: administrator
+        vhost: /log
+        perm:
+          - vhost: /log
+            configure_priv: .*
+            read_priv: .*
+            write_priv: .*
+    - RABBITMQ_EXCHANGES:
+      - name: logging
+        vhost: /log
+    - RABBITMQ_QUEUES:
+      - name: log
+        vhost: /log
+    - RABBITMQ_BINDINGS:
+      - name: logging
+        destination: log
+        vhost: /log
 
   roles:
     - mohsenSy.rabbitmq

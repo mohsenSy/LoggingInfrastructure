@@ -17,7 +17,7 @@ monolog:
           type: amqp
           exchange: 'PhpAmqpLib.Channel.AMQPExchange'
           exchange_name: 'logging'
-          level: warning
+          level: debug
         main:
             type: stream
             path: '%kernel.logs_dir%/%kernel.environment%.log'

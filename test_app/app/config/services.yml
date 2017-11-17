@@ -13,8 +13,9 @@ services:
       arguments:
         $host: localhost
         $port: 5672
-        $user: guest
-        $password: guest
+        $user: mohsen
+        $password: mohsen
+        $vhost: /log
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
