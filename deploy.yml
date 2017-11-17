@@ -1,12 +1,15 @@
 - hosts: web
   become: true
-  gather_facts: false
+  gather_facts: true
 
   handlers:
     - name: restart apache2
       service:
         name: apache2
         state: restarted
+
+  roles:
+    - mohsenSy.rabbitmq
 
   tasks:
     - name: Download composer installer
@@ -45,6 +48,12 @@
         - cli
         - apache2
       notify: restart apache2
+    - name: Run composer
+      shell: |
+        composer install -n
+        chdir=/var/www/html/test_app
+      register: comp
+      changed_when: comp.stdout.find("No thing to install or update") >= 0
     - name: copy apache2 configuration file
       copy:
         src: files/site.conf
@@ -75,6 +84,7 @@
         name: "/var/www/html/test_app/var/{{ item }}"
         state: directory
         mode: 0755
+        recurse: true
         owner: www-data
         group: www-data
       with_items:
