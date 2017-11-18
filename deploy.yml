@@ -29,6 +29,11 @@
     - RABBITMQ_EXCHANGES:
       - name: logging
         vhost: /log
+        type: fanout
+        state: absent
+      - name: logging
+        vhost: /log
+        type: fanout
     - RABBITMQ_QUEUES:
       - name: log
         vhost: /log
