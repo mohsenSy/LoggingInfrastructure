@@ -8,3 +8,7 @@ services:
       - "15672:15672"
     volumes:
       - ./test_app:/var/www/html/test_app
+  logstash:
+    image: mohsensy/ubuntu14.04-docker-ssh
+    ports:
+      - "2223:22"

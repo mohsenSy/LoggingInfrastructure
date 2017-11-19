@@ -125,3 +125,8 @@
         - cache
         - logs
         - sessions
+- hosts: logstash
+  become: true
+
+  roles:
+    - mohsenSy.java
