@@ -119,6 +119,31 @@
 - hosts: logstash
   become: true
 
+  vars:
+    - LOGSTASH_INPUTS:
+      - name: rabbitmq
+        options:
+          - name: host
+            value: '"192.168.10.10"'
+          - name: port
+            value: 5672
+          - name: queue
+            value: '"log"'
+          - name: durable
+            value: "true"
+          - name: passive
+            value: "true"
+          - name: exchange
+            value: '"logging"'
+          - name: user
+            value: '"mohsen"'
+          - name: password
+            value: '"mohsen"'
+          - name: vhost
+            value: '"/log"'
+
+
+
   roles:
     - mohsenSy.java
-    #- logstash
+    - mohsenSy.logstash
