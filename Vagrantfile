@@ -15,7 +15,6 @@ Vagrant.configure("2") do |config|
 
   # config.vm.network "public_network"
 
-  config.vm.synced_folder ".", "/vagrant", disabled:true
   config.vm.synced_folder "./test_app", "/var/www/html/test_app", type: "rsync"
 
   config.vm.provider "virtualbox" do |vb|
