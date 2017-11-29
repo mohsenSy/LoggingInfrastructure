@@ -152,9 +152,28 @@
         options:
           - name: codec
             value: rubydebug
+    - LOGSTASH_OUTPUTS:
+      - name: kafka
+        options:
+          - name: topic_id
+            value: log_topic
+          - name: codec
+            value: 'plain {format => "%{@timestamp} - %{level_name}.%{channel} - %{context} - %{message} - %{extra}"}'
 
 
 
   roles:
     - mohsenSy.java
     - mohsenSy.logstash
+
+- hosts: kafka_servers
+  become: true
+  gather_facts: true
+
+  vars:
+    - KAFKA_TOPICS:
+      - name: log_topic
+
+  roles:
+    - zookeeper
+    - kafka
