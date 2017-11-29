@@ -141,6 +141,17 @@
             value: '"mohsen"'
           - name: vhost
             value: '"/log"'
+    - LOGSTASH_FILTERS:
+      - name: date
+        if: "[@metadata][rabbitmq_properties][datetime]"
+        options:
+          - name: match
+            value: '["[@metadata][rabbitmq_properties][datetime]", "UNIX"]'
+    - LOGSTASH_OUTPUTS:
+      - name: stdout
+        options:
+          - name: codec
+            value: rubydebug
 
 
 
