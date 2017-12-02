@@ -147,18 +147,21 @@
         options:
           - name: match
             value: '["[@metadata][rabbitmq_properties][datetime]", "UNIX"]'
+      - name: json
+        options:
+          - name: source
+            value: '"%{@timestamp} - %{level_name}.%{channel} - %{context} - %{message} - %{extra}"'
     - LOGSTASH_OUTPUTS:
       - name: stdout
         options:
           - name: codec
-            value: rubydebug
-    - LOGSTASH_OUTPUTS:
+            value: json
       - name: kafka
         options:
           - name: topic_id
             value: log_topic
           - name: codec
-            value: 'plain {format => "%{@timestamp} - %{level_name}.%{channel} - %{context} - %{message} - %{extra}"}'
+            value: '"json"'
 
 
 
@@ -175,5 +178,10 @@
       - name: log_topic
 
   roles:
-    - zookeeper
-    - kafka
+    - confluent
+- hosts: elasticsearch_servers
+  become: true
+  gather_facts: true
+
+  roles:
+    - mohsenSy.elasticsearch
