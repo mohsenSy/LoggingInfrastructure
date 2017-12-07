@@ -178,10 +178,12 @@
       - name: log_topic
 
   roles:
+    - mohsenSy.java
     - confluent
 - hosts: elasticsearch_servers
   become: true
   gather_facts: true
 
   roles:
+    - mohsenSy.java
     - mohsenSy.elasticsearch
