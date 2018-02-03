@@ -43,7 +43,6 @@
 #phpstorm
 /.idea
 
-/web/app_dev.php
 
 /web/robots.txt
 #node.js

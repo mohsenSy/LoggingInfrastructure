@@ -8,8 +8,8 @@
         name: apache2
         state: restarted
   vars:
-    - RABBITMQ_USER: mohsen
-    - RABBITMQ_PASS: mohsen
+    - RABBITMQ_USER: logger
+    - RABBITMQ_PASS: logger_pass
     - RABBITMQ_PLUGINS:
       - name: rabbitmq_management
     - RABBITMQ_VHOSTS:
@@ -17,8 +17,8 @@
     - RABBITMQ_USERS:
       - name: guest
         state: absent
-      - name: mohsen
-        password: mohsen
+      - name: logger
+        password: logger_pass
         tags: administrator
         vhost: /log
         perm:
@@ -31,11 +31,11 @@
         vhost: /log
         type: fanout
     - RABBITMQ_QUEUES:
-      - name: log
+      - name: logs
         vhost: /log
     - RABBITMQ_BINDINGS:
       - name: logging
-        destination: log
+        destination: logs
         vhost: /log
 
   roles:
@@ -128,7 +128,7 @@
           - name: port
             value: 5672
           - name: queue
-            value: '"log"'
+            value: '"logs"'
           - name: durable
             value: "true"
           - name: passive
@@ -136,9 +136,9 @@
           - name: exchange
             value: '"logging"'
           - name: user
-            value: '"mohsen"'
+            value: '"logger"'
           - name: password
-            value: '"mohsen"'
+            value: '"logger_pass"'
           - name: vhost
             value: '"/log"'
     - LOGSTASH_FILTERS:
@@ -152,19 +152,14 @@
           - name: source
             value: '"%{@timestamp} - %{level_name}.%{channel} - %{context} - %{message} - %{extra}"'
     - LOGSTASH_OUTPUTS:
-      - name: stdout
-        options:
-          - name: codec
-            value: json
       - name: kafka
         options:
           - name: topic_id
-            value: log_topic
+            value: logs_data
           - name: codec
             value: '"json"'
-
-
-
+          - name: bootstrap_servers
+            value: '"localhost:9092"'
   roles:
     - mohsenSy.java
     - mohsenSy.logstash
@@ -175,7 +170,7 @@
 
   vars:
     - KAFKA_TOPICS:
-      - name: log_topic
+      - name: logs_data
 
   roles:
     - mohsenSy.java
