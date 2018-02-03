@@ -13,8 +13,8 @@ services:
       arguments:
         $host: localhost
         $port: 5672
-        $user: mohsen
-        $password: mohsen
+        $user: logger
+        $password: logger_pass
         $vhost: /log
     #service_name:
     #    class: AppBundle\Directory\ClassName
