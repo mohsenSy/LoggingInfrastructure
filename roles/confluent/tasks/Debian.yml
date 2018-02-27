@@ -1,0 +1,13 @@
+- name: Add confluent public key
+  apt_key:
+    url: http://packages.confluent.io/deb/4.0/archive.key
+    state: present
+- name: Add confluent repository
+  apt_repository:
+    repo: "deb [arch=amd64] http://packages.confluent.io/deb/4.0 stable main"
+    state: present
+    update_cache: true
+- name: Install confluent
+  apt:
+    name: confluent-platform-oss-2.11
+    state: present

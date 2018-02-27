@@ -1,0 +1,22 @@
+---
+- hosts: kafka_servers
+  become: true
+  gather_facts: true
+
+  vars:
+    - CON_KAFKA_TOPICS:
+      - name: log_topic
+    - CON_KAFKA_CONNECTS:
+      - name: elasticsearch-sink
+        cpnnection.url: http://localhost:9200
+        key.ignore: true
+        schema.ignore: true
+        type.name: kafka-connect
+        connector.class: io.confluent.connect.elasticsearch.ElasticsearchSinkConnector
+        topics: log_topic
+        value.converter: org.apache.kafka.connect.json.JsonConverter
+        value.converter.schemas.enable: false
+
+  roles:
+    - mohsenSy.java
+    - confluent

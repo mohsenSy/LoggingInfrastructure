@@ -1,0 +1,110 @@
+- hosts: web_nodes
+  become: true
+  gather_facts: true
+
+  vars:
+    - RABBITMQ_USER: logger
+    - RABBITMQ_PASS: logger_pass
+    - RABBITMQ_PLUGINS:
+      - name: rabbitmq_management
+    - RABBITMQ_VHOSTS:
+      - name: /log
+    - RABBITMQ_USERS:
+      - name: guest
+        state: absent
+      - name: logger
+        password: logger_pass
+        tags: administrator
+        vhost: /log
+        perm:
+          - vhost: /log
+            configure_priv: ".*"
+            read_priv: ".*"
+            write_priv: ".*"
+    - RABBITMQ_EXCHANGES:
+      - name: logging
+        vhost: /log
+        type: fanout
+    - RABBITMQ_QUEUES:
+      - name: logs
+        vhost: /log
+    - RABBITMQ_BINDINGS:
+      - name: logging
+        destination: logs
+        vhost: /log
+
+  roles:
+    - rabbitmq
+
+- hosts: logstash_nodes
+  become: true
+
+  vars:
+    - LOGSTASH_INPUTS:
+      - name: rabbitmq
+        options:
+          - name: host
+            value: '"192.168.10.10"'
+          - name: port
+            value: 5672
+          - name: queue
+            value: '"logs"'
+          - name: durable
+            value: "true"
+          - name: passive
+            value: "true"
+          - name: exchange
+            value: '"logging"'
+          - name: user
+            value: '"logger"'
+          - name: password
+            value: '"logger_pass"'
+          - name: vhost
+            value: '"/log"'
+    - LOGSTASH_FILTERS:
+      - name: date
+        if: "[@metadata][rabbitmq_properties][datetime]"
+        options:
+          - name: match
+            value: '["[@metadata][rabbitmq_properties][datetime]", "UNIX"]'
+      - name: json
+        options:
+          - name: source
+            value: '"%{@timestamp} - %{level_name}.%{channel} - %{context} - %{message} - %{extra}"'
+    - LOGSTASH_OUTPUTS:
+      - name: kafka
+        options:
+          - name: topic_id
+            value: logs_data
+          - name: codec
+            value: '"json"'
+          - name: bootstrap_servers
+            value: '"localhost:9092"'
+  roles:
+    - mohsenSy.java
+    - mohsenSy.logstash
+
+- hosts: kafka_nodes
+  become: true
+  gather_facts: true
+
+  roles:
+    - mohsenSy.java
+    - confluent
+- hosts: elasticsearch_nodes
+  become: true
+  gather_facts: true
+
+  roles:
+    - mohsenSy.java
+    - mohsenSy.elasticsearch
+
+- hosts: kibana_nodes
+  become: true
+  gather_facts: true
+
+  vars:
+    - KIBANA_HOST: "0.0.0.0"
+
+  roles:
+    - mohsenSy.kibana

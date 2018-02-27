@@ -1,4 +1,4 @@
-- hosts: web
+- hosts: web_nodes
   become: true
   gather_facts: true
 
@@ -57,6 +57,7 @@
         - php-xml
         - php-bcmath
         - php-mbstring
+        - php-zip
     - name: start apache2
       service:
         name: apache2
@@ -116,7 +117,7 @@
         - cache
         - logs
         - sessions
-- hosts: logstash
+- hosts: logstash_nodes
   become: true
 
   vars:
@@ -162,23 +163,29 @@
             value: '"localhost:9092"'
   roles:
     - mohsenSy.java
-    - mohsenSy.logstash
+    - logstash
 
-- hosts: kafka_servers
+- hosts: kafka_nodes
   become: true
   gather_facts: true
-
-  vars:
-    - KAFKA_TOPICS:
-      - name: logs_data
 
   roles:
     - mohsenSy.java
     - confluent
-- hosts: elasticsearch_servers
+- hosts: elasticsearch_nodes
   become: true
   gather_facts: true
 
   roles:
     - mohsenSy.java
-    - mohsenSy.elasticsearch
+    - elasticsearch
+
+- hosts: kibana_nodes
+  become: true
+  gather_facts: true
+
+  vars:
+    - KIBANA_HOST: "0.0.0.0"
+
+  roles:
+    - kibana
